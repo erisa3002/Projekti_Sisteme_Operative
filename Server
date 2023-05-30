@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+#define MAX_CLIENTS 5
+#define BUFFER_SIZE 1024
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int connectedClients = 0;
+
+typedef struct {
+    int clientSocket;
+    struct sockaddr_in clientAddr;
+} ClientInfo;
+
+void *clientHandler(void *arg) {
+    ClientInfo *clientInfo = (ClientInfo *)arg;
+    int clientSocket = clientInfo->clientSocket;
+    struct sockaddr_in clientAddr = clientInfo->clientAddr;
+    char buffer[BUFFER_SIZE];
+    char clientIP[INET_ADDRSTRLEN];
+
+  
+    inet_ntop(AF_INET, &(clientAddr.sin_addr), clientIP, INET_ADDRSTRLEN);
+
+  
+    char connectMsg[] = "Jeni të lidhur me Server.";
+    send(clientSocket, connectMsg, strlen(connectMsg), 0);
+
+  
+    pthread_mutex_lock(&mutex);
+    connectedClients++;
+    printf("\nKlienti u Lidh, IP: %s\n", clientIP);
+    printf("\nTotali i Klienteve te Lidhur: %d\n", connectedClients);
+    pthread_mutex_unlock(&mutex);
+
+    
+    while (recv(clientSocket, buffer, BUFFER_SIZE, 0) > 0) {
+        
+        if (strcmp(buffer, "shkeput") == 0) {
+            printf("\nKlienti Kërkon të Shkeputet: %s\n", clientIP);
+            break;
+        }
+
+        
+        
+        char responseMsg[] = "Serveri po Komunikon me Ju.";
+        send(clientSocket, responseMsg, strlen(responseMsg), 0);
+    }
+
+   
+    pthread_mutex_lock(&mutex);
+    connectedClients--;
+    printf("\nKlienti u Shkëput, IP: %s\n", clientIP);
+    printf("\nTotali i Klientëve të Lidhur: %d\n", connectedClients);
+    pthread_mutex_unlock(&mutex);
+
+   
+    close(clientSocket);
+
+    free(clientInfo);
+    pthread_exit(NULL); 
+    }
