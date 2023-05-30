@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
+#define BUFFER_SIZE 1024
+
+int main() {
+    int clientSocket;
+    struct sockaddr_in serverAddr;
+    char buffer[BUFFER_SIZE];
+
+    
+    clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (clientSocket < 0) {
+        perror("\nKrijimi i Socket-it Dështoj");
+        exit(EXIT_FAILURE);
+    }
+
+   
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(8080);
+
+    if (inet_pton(AF_INET, "127.0.0.1", &(serverAddr.sin_addr)) <= 0) {
+        perror("\nAdresë e Pavlefshme/Adresa jo e Suportuar");
+        exit(EXIT_FAILURE);
+    }
+
+   
+    if (connect(clientSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
+        perror("\nLidhja Dështoj");
+        exit(EXIT_FAILURE);
+    }
+
+
+    while (1) {
+        printf("\nShëno një kërkesë (kerkesa1, kerkesa2, ose shkeput): ");
+        fgets(buffer, BUFFER_SIZE, stdin);
+        buffer[strcspn(buffer, "\n")] = '\0'; 
+
+        
+        send(clientSocket, buffer, strlen(buffer), 0);
+
+        
+        if (strcmp(buffer, "shkeput") == 0) {
+            printf("\nJeni të Shkeputur nga Serveri, Ekzekuto Klientin për tu Lidhur Përseri.\n\n");
+            break;
+        }
+
+        
+        memset(buffer, 0, sizeof(buffer));
+        if (recv(clientSocket, buffer, BUFFER_SIZE, 0) > 0) {
+            printf("\nPërgjigjia nga Serveri: %s\n", buffer);
+        }
+    }
+
+    
+    close(clientSocket);
+
+    return 0;
+}
