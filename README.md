@@ -20,6 +20,6 @@ Ekzekutoni klientin duke shkruar ./client në terminal.
 
 
 Studentet:
-Aladin Bajra
-Endi Rashica
-Erisa Cërvadiku
+Aladin Bajra,
+Endi Rashica,
+Erisa Cërvadiku.
