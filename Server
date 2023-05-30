@@ -59,6 +59,7 @@ void *clientHandler(void *arg) {
     }
     
     int main() {
+    
     int serverSocket, clientSocket;
     struct sockaddr_in serverAddr, clientAddr;
     socklen_t clientAddrLen;
