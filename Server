@@ -24,10 +24,8 @@ void *clientHandler(void *arg) {
     char buffer[BUFFER_SIZE];
     char clientIP[INET_ADDRSTRLEN];
 
-  
     inet_ntop(AF_INET, &(clientAddr.sin_addr), clientIP, INET_ADDRSTRLEN);
 
-  
     char connectMsg[] = "Jeni të lidhur me Server.";
     send(clientSocket, connectMsg, strlen(connectMsg), 0);
 
@@ -37,29 +35,23 @@ void *clientHandler(void *arg) {
     printf("\nKlienti u Lidh, IP: %s\n", clientIP);
     printf("\nTotali i Klienteve te Lidhur: %d\n", connectedClients);
     pthread_mutex_unlock(&mutex);
-
     
     while (recv(clientSocket, buffer, BUFFER_SIZE, 0) > 0) {
-        
         if (strcmp(buffer, "shkeput") == 0) {
             printf("\nKlienti Kërkon të Shkeputet: %s\n", clientIP);
             break;
         }
-
-        
-        
+ 
         char responseMsg[] = "Serveri po Komunikon me Ju.";
         send(clientSocket, responseMsg, strlen(responseMsg), 0);
     }
 
-   
     pthread_mutex_lock(&mutex);
     connectedClients--;
     printf("\nKlienti u Shkëput, IP: %s\n", clientIP);
     printf("\nTotali i Klientëve të Lidhur: %d\n", connectedClients);
     pthread_mutex_unlock(&mutex);
 
-   
     close(clientSocket);
 
     free(clientInfo);
@@ -79,18 +71,15 @@ void *clientHandler(void *arg) {
         exit(EXIT_FAILURE);
     }
 
-   
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = INADDR_ANY;
     serverAddr.sin_port = htons(8080);
 
-   
     if (bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
         perror("\nLidhja Dështoj");
         exit(EXIT_FAILURE);
     }
 
-   
     if (listen(serverSocket, MAX_CLIENTS) < 0) {
         perror("\nDegjimi Dështoj");
         exit(EXIT_FAILURE);
@@ -107,7 +96,6 @@ void *clientHandler(void *arg) {
             exit(EXIT_FAILURE);
         }
 
-       
         ClientInfo *clientInfo = (ClientInfo *)malloc(sizeof(ClientInfo));
         clientInfo->clientSocket = clientSocket;
         clientInfo->clientAddr = clientAddr;
@@ -116,13 +104,10 @@ void *clientHandler(void *arg) {
             exit(EXIT_FAILURE);
         }
 
-       
         pthread_detach(tid);
     }
 
-   
     close(serverSocket);
 
     return 0;
 }
-
