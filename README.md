@@ -12,10 +12,10 @@ Serveri pranon lidhje nga klientët dhe mbajt një listë të klientëve të lid
 Këto janë disa hapa që duhet të ndiqni për të testuar këtë shembull:
 
 Ruajeni kodin e serverit në një file me emrin server.c.
-Kompajlloni kodin e serverit duke përdorur komandën gcc -o server server.c -lpthread.
+Kompajlloni kodin e serverit duke përdorur komandën gcc server.c -o server -lpthread.
 Ekzekutoni serverin duke shkruar ./server në terminal.
 Ruajeni kodin e klientit në një file me emrin client.c.
-Kompajlloni kodin e klientit duke përdorur komandën gcc -o client client.c.
+Kompajlloni kodin e klientit duke përdorur komandën gcc client.c -o client.
 Ekzekutoni klientin duke shkruar ./client në terminal.
 
 
