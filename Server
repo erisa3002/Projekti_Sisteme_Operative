@@ -65,3 +65,64 @@ void *clientHandler(void *arg) {
     free(clientInfo);
     pthread_exit(NULL); 
     }
+    
+    int main() {
+    int serverSocket, clientSocket;
+    struct sockaddr_in serverAddr, clientAddr;
+    socklen_t clientAddrLen;
+    pthread_t tid;
+
+
+    serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocket < 0) {
+        perror("\nKrijimi i Socket-it Dështoj");
+        exit(EXIT_FAILURE);
+    }
+
+   
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    serverAddr.sin_port = htons(8080);
+
+   
+    if (bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0) {
+        perror("\nLidhja Dështoj");
+        exit(EXIT_FAILURE);
+    }
+
+   
+    if (listen(serverSocket, MAX_CLIENTS) < 0) {
+        perror("\nDegjimi Dështoj");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("\nServeri u Startua. Në Pritje për Klientë...\n");
+
+    while (1) {
+       
+        clientAddrLen = sizeof(clientAddr);
+        clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddr, &clientAddrLen);
+        if (clientSocket < 0) {
+            perror("\nPranimi Dështoj");
+            exit(EXIT_FAILURE);
+        }
+
+       
+        ClientInfo *clientInfo = (ClientInfo *)malloc(sizeof(ClientInfo));
+        clientInfo->clientSocket = clientSocket;
+        clientInfo->clientAddr = clientAddr;
+        if (pthread_create(&tid, NULL, clientHandler, (void *)clientInfo) != 0) {
+            perror("\nKrijimi i Thread-it Dështoj");
+            exit(EXIT_FAILURE);
+        }
+
+       
+        pthread_detach(tid);
+    }
+
+   
+    close(serverSocket);
+
+    return 0;
+}
+
